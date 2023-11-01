@@ -1,0 +1,7 @@
+# TODO: Create Kubernetes configuration files for the application deployment and service.
+#     Deployment Configuration: Create a 'deployment.yaml' file.
+#    - Define the necessary specifications, including the number of replicas, selector matchLabels, and template spec (such as the container image to use, environment variables, and resources).
+#    - Ensure the deployment strategy is defined to manage updates and rollbacks effectively (consider using RollingUpdate).
+#    - Include configuration for readiness and liveness probes to ensure the Kubernetes system properly manages the application instances' lifecycles.
+#    - Specify any volume mounts if the application needs specific storage resources.
+#
