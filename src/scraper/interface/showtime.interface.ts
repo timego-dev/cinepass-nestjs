@@ -5,4 +5,5 @@ interface ShowtimeInterface {
   showtimeInUTC: string;
   bookingLink: string;
   attributes: string[];
+  city?: string;
 }

@@ -1,11 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import {Injectable, Logger} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ShowtimeEntity } from './entity/showtime.entity';
-import { DataSource, Repository } from 'typeorm';
+import {DataSource, QueryFailedError, Repository} from 'typeorm';
 import { ShowtimeSummaryEntity } from './entity/showtimeSummary.entity';
 
 @Injectable()
 export class ShowtimeService {
+  private readonly logger = new Logger(ShowtimeService.name);
   constructor(
     @InjectRepository(ShowtimeEntity)
     private showtimeEntityRepository: Repository<ShowtimeEntity>,
@@ -32,18 +33,18 @@ export class ShowtimeService {
         from "showtime"
         group by 1, 2, 3, 4, 5
         ON CONFLICT
-            (
-            "showtimeDate",
-            "cinemaName",
-            "movieTitle",
-            attributes,
-            city
-            )
-            DO UPDATE
-                   SET "showtimeCount"= EXCLUDED."showtimeCount"
+          (
+          "showtimeDate",
+          "cinemaName",
+          "movieTitle",
+          attributes,
+          city
+          )
+        DO UPDATE
+               SET "showtimeCount"= EXCLUDED."showtimeCount"
     `);
-    //TODO: Investigate and resolve the duplication issue in the "showtime-summary" table.
-    // If you check the "showtime-summary" table rows you will notice that there duplicate rows.
+    //DONE: Investigate and resolve the duplication issue in the "showtime-summary" table.
+    // If you check the "showtime-summary" table rows you will notice that there duxplicate rows.
     // Analyze the current aggregation query to identify why duplicates are being created.
     // Modify the query or the table structure as necessary to prevent duplicate entries.
     // Ensure your solution maintains data integrity and optimizes performance.
@@ -51,7 +52,14 @@ export class ShowtimeService {
 
   async addShowtimes(showtimes: ShowtimeInterface[]) {
     for (const showtime of showtimes) {
-      await this.dataSource
+      const existingShowtime = await this.showtimeEntityRepository.findOne({ where: { showtimeId: showtime.showtimeId } });
+      if (existingShowtime) {
+        this.logger.error('Duplicated Showtime Id');
+        continue;
+      }
+
+      try {
+        await this.dataSource
         .createQueryBuilder()
         .insert()
         .into(ShowtimeEntity)
@@ -62,10 +70,14 @@ export class ShowtimeService {
           showtimeInUTC: showtime.showtimeInUTC,
           bookingLink: showtime.bookingLink,
           attributes: showtime.attributes,
+          city: showtime.city || "",
         })
         .execute();
+      } catch (error) {
+        this.logger.error(error.message);
+      }
 
-      //TODO: Implement error handling for cases where a duplicate 'showtimeId' is used during insertion.
+      //Done: Implement error handling for cases where a duplicate 'showtimeId' is used during insertion.
       // Consider how the application should behave in this scenario (e.g., skip, replace, or abort the operation).
       // Implement the necessary logic and provide feedback or logging for the operation outcome.
       // Ensure your solution handles such conflicts gracefully without causing data inconsistency or application failure.
