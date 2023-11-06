@@ -43,7 +43,7 @@ export class ShowtimeService {
         DO UPDATE
                SET "showtimeCount"= EXCLUDED."showtimeCount"
     `);
-    //DONE: Investigate and resolve the duplication issue in the "showtime-summary" table.
+    // DONE: Investigate and resolve the duplication issue in the "showtime-summary" table.
     // If you check the "showtime-summary" table rows you will notice that there duxplicate rows.
     // Analyze the current aggregation query to identify why duplicates are being created.
     // Modify the query or the table structure as necessary to prevent duplicate entries.
@@ -77,7 +77,7 @@ export class ShowtimeService {
         this.logger.error(error.message);
       }
 
-      //Done: Implement error handling for cases where a duplicate 'showtimeId' is used during insertion.
+      // Done: Implement error handling for cases where a duplicate 'showtimeId' is used during insertion.
       // Consider how the application should behave in this scenario (e.g., skip, replace, or abort the operation).
       // Implement the necessary logic and provide feedback or logging for the operation outcome.
       // Ensure your solution handles such conflicts gracefully without causing data inconsistency or application failure.

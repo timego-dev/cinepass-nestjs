@@ -7,6 +7,10 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
+    // DONE: Refactor this section to use the NestJS configuration management feature.
+    // Avoid hardcoding sensitive information and use environment variables instead.
+    // You may need to create a separate configuration module or use an existing one.
+    // Ensure that the solution is scalable and environment agnostic.
     ConfigModule.forRoot(),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
