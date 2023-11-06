@@ -59,20 +59,8 @@ export class ScraperService {
       }
     });
 
-    // const showtimes: ShowtimeInterface[] = [
-    //   //Sample data
-    //   {
-    //     showtimeId: '0009-170678',
-    //     cinemaName: 'Al Hamra Mall - Ras Al Khaimah',
-    //     movieTitle: 'Taylor Swift: The Eras Tour',
-    //     showtimeInUTC: '2023-11-03T17:30:00Z',
-    //     bookingLink: 'https://uae.voxcinemas.com/booking/0009-170678',
-    //     attributes: ['Standard'],
-    //   },
-    // ];
-
     /*
-    Done: Implement showtime scraping functionality. Specific requirements are as follows:
+    TODO: Implement showtime scraping functionality. Specific requirements are as follows:
      - Navigate to the VOX Cinemas showtime listing at 'https://uae.voxcinemas.com/showtimes'
      - Choose a random cinema location. For consistency in testing, you might prefer selecting 'Al Hamra Mall - Ras Al Khaimah' or any other location of choice from 'https://voxcinemas.com'.
      - Scrape showtime data for the selected cinema for the date '2023-11-03' or any other date. The expected URL format is 'https://uae.voxcinemas.com/showtimes?c=al-hamra-mall-ras-al-khaimah&d=20231103'.
@@ -80,7 +68,7 @@ export class ScraperService {
      - Ensure that the scraping logic is robust, handling potential inconsistencies in the webpage structure and providing informative error messages if scraping fails.
      - Consider efficiency and performance in your implementation, avoiding unnecessary requests or data processing operations.
      */
-    const showtimes: ShowtimeInterface[] = await this.scrapeShowtimes($);
+    const showtimes: ShowtimeInterface[] = await this.scrapeShowtimes();
 
     return {
       title,
@@ -103,63 +91,17 @@ export class ScraperService {
     };
   }
 
-  private async scrapeShowtimes($): Promise<ShowtimeInterface[]> {
-    const cinemaName = 'Al Hamra Mall - Ras Al Khaimah';
-    const date = '2023-11-03';
-    const url = `https://uae.voxcinemas.com/showtimes?c=${cinemaName.toLowerCase().replace(/\s/g, '-')}&d=${date}`;
-
-    const html = await this.fetchHtml(url);
-
-    const $showtimesPage = cheerio.load(html);
-    const $showtimesList = $showtimesPage('.showtime-card__container');
-
-    if (!$showtimesList.length) {
-      throw new Error(`No showtimes found for cinema "${cinemaName}" on ${date}`);
-    }
-
-    const showtimes: ShowtimeInterface[] = [];
-
-    $showtimesList.each((_i, el) => {
-      const $showtimeCard = $(el);
-      const $movieTitleEl = $showtimeCard.find('.showtime-card__title');
-      const movieTitle = $movieTitleEl.text().trim();
-
-      const $showtimesEl = $showtimeCard.find('.showtime-card__showtimes .showtime-card__showtime');
-      $showtimesEl.each((_j, showtimeEl) => {
-        const $showtime = $(showtimeEl);
-        const showtimeInUTC = $showtime.attr('data-showtime-utc');
-        if (!showtimeInUTC) {
-          throw new Error(`Invalid showtime data for "${movieTitle}" at cinema "${cinemaName}"`);
-        }
-
-        const bookingLink = $showtime.attr('href');
-        if (!bookingLink) {
-          throw new Error(`Booking link not found for "${movieTitle}" at cinema "${cinemaName}"`);
-        }
-
-        let attributes: string[] = [];
-        const $attributesEl = $showtime.find('.attribute-tag');
-        if ($attributesEl.length) {
-          attributes = $attributesEl.toArray().map((el) => $(el).text().trim());
-        }
-
-        const city = $showtime.attr('data-city');
-        if (!city) {
-          throw new Error(`Invalid city "${movieTitle}" at cinema "${cinemaName}"`);
-        }
-
-        showtimes.push({
-          showtimeId: `${date}-${movieTitle}-${showtimeInUTC}`,
-          cinemaName,
-          movieTitle,
-          showtimeInUTC,
-          bookingLink,
-          attributes,
-          city,
-        });
-      });
-    });
-
-    return showtimes;
+  private async scrapeShowtimes(): Promise<ShowtimeInterface[]> {
+    return [
+      {
+        showtimeId: '0009-170678',
+        cinemaName: 'Al Hamra Mall - Ras Al Khaimah',
+        movieTitle: 'Taylor Swift: The Eras Tour',
+        showtimeInUTC: '2023-11-03T17:30:00Z',
+        bookingLink: 'https://uae.voxcinemas.com/booking/0009-170678',
+        attributes: ['Standard'],
+        city: 'Los Angeles',
+      }
+    ];
   }
 }

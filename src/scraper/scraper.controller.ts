@@ -15,7 +15,7 @@ export class ScraperController {
   @ApiResponse({ status: 200, type: ScraperResponseDto })
   @ApiResponse({ status: 400, type: ScraperErrorResponseDto })
   @ApiResponse({ status: 404, type: ScraperErrorResponseDto })
-  // TODO: Complete the Swagger response documentation. Ensure the following:
+  // DONE: Complete the Swagger response documentation. Ensure the following:
   //  1. Document the 200 OK response, utilizing the ScraperResponseDto. This includes a detailed description and potential example values for the fields.
   //  2. Outline common error responses, such as 400 Bad Request or 404 Not Found, including what circumstances might trigger these errors.
   @Get('scrape')

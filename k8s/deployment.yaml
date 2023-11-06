@@ -5,3 +5,49 @@
 #    - Include configuration for readiness and liveness probes to ensure the Kubernetes system properly manages the application instances' lifecycles.
 #    - Specify any volume mounts if the application needs specific storage resources.
 #
+
+apiVersion: v1
+kind: Deployment
+metadata:
+  name: od-test-task
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: od-test-task
+  template:
+    metadata:
+      labels:
+        app: od-test-task
+    spec:
+      containers:
+        - name: od-test-task
+          image: od-test-task:v1.0.0
+          ports:
+            - containerPort: 8080
+          env:
+            - name: DB_HOST
+              value: http://localhost:5432
+          resources:
+            limits:
+              cpu: "1"
+              memory: "1Gi"
+            requests:
+              cpu: "500m"
+              memory: "512Mi"
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+      volumes:
+        - name: od-test-volume
+          persistentVolumeClaim:
+            claimName: od-test-pvc
